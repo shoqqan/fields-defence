@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import type { RefObject } from "react";
 
 const DATA = {
   q1Distribution: [
@@ -66,7 +67,7 @@ const DATA = {
   },
 };
 
-function useInView(ref) {
+function useInView<T extends Element>(ref: RefObject<T | null>) {
   const [inView, setInView] = useState(false);
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -81,7 +82,15 @@ function useInView(ref) {
   return inView;
 }
 
-function AnimatedBar({ value, max, color, delay, animate }) {
+interface AnimatedBarProps {
+  value: number;
+  max: number;
+  color: string;
+  delay: number;
+  animate: boolean;
+}
+
+function AnimatedBar({ value, max, color, delay, animate }: AnimatedBarProps) {
   const [width, setWidth] = useState(0);
   useEffect(() => {
     if (animate) {
@@ -113,7 +122,7 @@ function AnimatedBar({ value, max, color, delay, animate }) {
   );
 }
 
-function Chart1({ animate }) {
+function Chart1({ animate }: { animate: boolean }) {
   const max = 14;
   return (
     <div>
@@ -213,7 +222,7 @@ function Chart1({ animate }) {
   );
 }
 
-function Chart2({ animate }) {
+function Chart2({ animate }: { animate: boolean }) {
   const maxMean = 5;
   return (
     <div>
@@ -380,16 +389,15 @@ function Chart2({ animate }) {
   );
 }
 
-function Chart3({ animate }) {
-  const svgRef = useRef(null);
+function Chart3({ animate }: { animate: boolean }) {
+  const svgRef = useRef<SVGSVGElement | null>(null);
   const [drawn, setDrawn] = useState(false);
   const W = 360,
     H = 260,
     PAD = 40;
-  const toX = (v) => PAD + ((v - 1) / 4) * (W - PAD * 2);
-  const toY = (v) => H - PAD - ((v - 1) / 4) * (H - PAD * 2);
-  const r = 0.342,
-    p = 0.095;
+  const toX = (v: number) => PAD + ((v - 1) / 4) * (W - PAD * 2);
+  const toY = (v: number) => H - PAD - ((v - 1) / 4) * (H - PAD * 2);
+  const r = 0.342;
   const slope = r * 1.0;
   const intercept = 3.0 - slope * 3.0;
   const x1 = 1,
@@ -404,7 +412,7 @@ function Chart3({ animate }) {
     }
   }, [animate]);
 
-  const jitter = (v, seed) =>
+  const jitter = (v: number, seed: number) =>
     v + (((seed * 9301 + 49297) % 233280) / 233280 - 0.5) * 0.22;
 
   return (
@@ -581,7 +589,7 @@ function Chart3({ animate }) {
 
 export default function Charts() {
   const [active, setActive] = useState(0);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const inView = useInView(ref);
 
   const charts = [
